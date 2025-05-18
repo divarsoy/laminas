@@ -29,6 +29,7 @@ class AlbumTable
                 $id
             ));
         }
+        return $row;
     }
 
     public function saveAlbum(Album $album)
