@@ -1,0 +1,10 @@
+/.phpcs-cache
+/.phpunit.cache
+/.psalm-cache
+vendor/
+config/development.config.php
+data/cache/*
+!data/cache/.gitkeep
+phpunit.xml
+/.vscode
+/.phpstorm.meta.php
