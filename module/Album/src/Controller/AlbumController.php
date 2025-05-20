@@ -6,6 +6,7 @@ use Laminas\View\Model\ViewModel;
 use Album\Model\AlbumTable;
 use Album\Form\AlbumForm;
 Use Album\Model\Album;
+use Laminas\View\Model\JsonModel;
 
 Class AlbumController extends AbstractActionController
 {
@@ -20,6 +21,21 @@ Class AlbumController extends AbstractActionController
         return new ViewModel([
             'albums' => $this->table->fetchAll(),
         ]);
+    }
+
+    public function apiAction()
+    {
+        $albums = $this->table->fetchAll();
+        $data = [];
+
+        foreach ($albums as $album) {
+            $data[] = [
+                'id' => $album->id,
+                'title' => $album->title,
+                'artist' => $album->artist,
+            ];
+        }
+        return new JsonModel($data);
     }
 
     public function addAction()

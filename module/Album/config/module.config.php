@@ -26,7 +26,7 @@ return [
                     'defaults' => [
                         'controller' => Controller\AlbumController::class,
                         'action' => 'index',
-                    ]
+                    ],
                 ]
             ]
         ]
@@ -35,6 +35,9 @@ return [
     'view_manager' => [
         'template_path_stack' => [
             'album' => __DIR__ . '/../view',
+        ],
+        'strategies' => [
+            'ViewJsonStrategy',
         ],
     ],
 
