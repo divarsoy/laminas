@@ -8,3 +8,5 @@ data/cache/*
 phpunit.xml
 /.vscode
 /.phpstorm.meta.php
+frontend/node_modules/
+/public/assets
