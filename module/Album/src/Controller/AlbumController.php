@@ -6,7 +6,9 @@ use Laminas\View\Model\ViewModel;
 use Album\Model\AlbumTable;
 use Album\Form\AlbumForm;
 Use Album\Model\Album;
+use JsonException;
 use Laminas\View\Model\JsonModel;
+use Laminas\Http\Response;
 
 Class AlbumController extends AbstractActionController
 {
@@ -36,6 +38,41 @@ Class AlbumController extends AbstractActionController
             ];
         }
         return new JsonModel($data);
+    }
+
+    public function apiAddAction()
+    {  
+        $request = $this->getRequest();
+
+        $response = new Response();
+        if ( ! $request->isPost()) {
+            $response->setStatusCode(Response::STATUS_CODE_403);
+            return $response;
+        }
+
+        $form = new AlbumForm();
+        $album = new Album();
+        $form->setInputFilter($album->getInputFilter());
+        $content = json_decode($request->getContent(),true);
+
+        $form->setData($content);
+        if( ! $form->isValid()) {
+            $response->setStatusCode(Response::STATUS_CODE_400);
+            try {
+                $json = json_encode(['error'=> $form->getMessages()], JSON_THROW_ON_ERROR);
+            } catch(JsonException $e){
+                error_log('JSON encode error: ' . $e->getMessage());
+                $json = '{}'; 
+            }
+            $response->setContent($json);
+            return $response;
+        }
+
+        $album->exchangeArray($form->getData());
+        $this->table->saveAlbum($album);
+        $response->isOk();
+        return $response;
+
     }
 
     public function addAction()
