@@ -7,6 +7,7 @@ use Laminas\Test\PHPUnit\Controller\AbstractHttpControllerTestCase;
 use Album\Model\AlbumTable;
 use Album\Model\Album;
 use Laminas\ServiceManager\ServiceManager;
+use Laminas\Http\Response;
 
 class AlbumControllerTest extends AbstractHttpControllerTestCase
 {
@@ -76,5 +77,24 @@ class AlbumControllerTest extends AbstractHttpControllerTestCase
     $this->assertRedirectTo('/album');
     }       
 
-    
+    public function testApiDeleteEndpointCanBeAccessedViaDELETE()
+    {
+        $id = 1;
+        $this->albumTable->expects($this->once())
+            ->method('deleteAlbum')
+            ->with($id);
+        $this->dispatch('/album/apiDelete/'.$id, 'DELETE');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_200);
+        
+        $response = $this->getResponse()->getContent();
+        $this->assertSame(json_encode(['data' => 'ok']), $response);
+    }   
+
+    public function testApiDeleteEndpointCanNotBeAccessedViaGET ()
+    {
+        $id = 1;
+        $this->dispatch('/album/apiDelete/'.$id, 'GET');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_403);
+        // $this->assertContains(json_encode(['data' => 'ok'], JSON_THROW_ON_ERROR), );
+    }   
 }
