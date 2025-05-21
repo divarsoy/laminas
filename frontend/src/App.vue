@@ -41,26 +41,26 @@
   
 <script setup>
     import { reactive, ref } from 'vue'
-    const artist = ref('')
-    const title = ref('')
-    const placeHolder = ref('')
-
+    const artist = ref('');
+    const title = ref('');
 
     const albumCollection = reactive({
         albums: []
     });
 
     fetchAlbums();
-    function fetchAlbums() {
-        fetch('/album/api')
-        .then(res => res.json())
-        .then(data => {
+
+    async function fetchAlbums() {
+        try {
+            const response = await fetch('/album/api');
+            const data = await response.json();
             albumCollection.albums = data;
-        });
-    }
+        } catch (error) {
+            console.error('Error listing albums:', error);
+        }
+   }
 
-    function addItem() {
-
+    async function addItem() {
         const requestOptions = {
             method:'POST',
             headers: {'content-Type': 'application/json'},
@@ -70,15 +70,18 @@
                 title: title.value
             })
         }
-        fetch('/album/apiAdd', requestOptions)
-        .then(response => response.json())
-        .then(data => placeHolder.value = data);
-
-        title.value = '';
-        artist.value = '';
-        fetchAlbums();
+        try {
+            const response = await fetch('/album/apiAdd', requestOptions);
+            const data = await response.json();
+            title.value = '';
+            artist.value = '';
+            await fetchAlbums();
+        } catch (error) {
+            console.error('Error adding album:', error);
+        }
     }
-    function deleteItem(event) {
+
+    async function deleteItem(event) {
         const id = event.target.getAttribute('data-id');
         const requestOptions = {
             method:'DELETE',
@@ -87,12 +90,13 @@
                 id: id
             })
         }
-        fetch('/album/apiDelete/'+id, requestOptions)
-        .then(response => response.json())
-        .then(data => {
-            placeHolder.value = data;
-            fetchAlbums();
-        });
+        try{
+            const response = await fetch('/album/apiDelete/'+id, requestOptions);
+            const data = await response.json();
+            await fetchAlbums();
+        } catch (error) {
+            console.error('Error deleting album:', error);
+        }
     }
 
 </script>
