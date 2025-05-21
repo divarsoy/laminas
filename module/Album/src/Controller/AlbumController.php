@@ -71,6 +71,31 @@ Class AlbumController extends AbstractActionController
         $album->exchangeArray($form->getData());
         $this->table->saveAlbum($album);
         $response->isOk();
+        $response->setContent(json_encode($album), JSON_THROW_ON_ERROR);
+        return $response;
+
+    }
+
+    public function apiDeleteAction() {
+
+        $response = new Response();
+        $id = (int) $this->params()->fromRoute('id',0);
+        if( ! $id) {
+            $response->setStatusCode(Response::STATUS_CODE_400);
+            $response->setContent(json_encode(['error' => 'No ID defined in url path']));
+            return $response;
+        }
+
+        $request = $this->getRequest();
+
+        if ($request->isDelete()) {
+            $this->table->deleteAlbum((int) $id);
+            $response->isOk();
+            $response->setContent(json_encode(['data' => 'ok']), JSON_THROW_ON_ERROR);
+            return $response;
+        }
+        
+        $response->setStatusCode(Response::STATUS_CODE_403);
         return $response;
 
     }
