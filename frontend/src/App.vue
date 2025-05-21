@@ -65,14 +65,13 @@
             method:'POST',
             headers: {'content-Type': 'application/json'},
             body: JSON.stringify({
-                id:0,
                 artist: artist.value,
                 title: title.value
             })
         }
         try {
             const response = await fetch('/album/apiAdd', requestOptions);
-            const data = await response.json();
+            await response.json();
             title.value = '';
             artist.value = '';
             await fetchAlbums();

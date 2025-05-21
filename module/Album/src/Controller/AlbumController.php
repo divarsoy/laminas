@@ -42,6 +42,7 @@ Class AlbumController extends AbstractActionController
 
     public function apiAddAction()
     {  
+        $id = 0; // Id is required for validation. 0 will insert a record when calling AlbumTable->saveAlbum()
         $request = $this->getRequest();
 
         $response = new Response();
@@ -54,6 +55,7 @@ Class AlbumController extends AbstractActionController
         $album = new Album();
         $form->setInputFilter($album->getInputFilter());
         $content = json_decode($request->getContent(),true);
+        $content['id']= $id; 
 
         $form->setData($content);
         if( ! $form->isValid()) {
