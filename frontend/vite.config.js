@@ -5,7 +5,7 @@ import path from 'path'
 export default defineConfig({
   plugins: [vue()],
   build: {
-    outDir: '../public/',
+    outDir: '../public/frontend',
     emptyOutDir: true,
     rollupOptions: {
       input: './index.html'
