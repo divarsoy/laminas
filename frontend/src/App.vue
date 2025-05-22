@@ -11,14 +11,11 @@
         </thead>
         <tbody>
             <tr v-for="album in albumCollection.albums" :key="album.id">
-            <td>{{ album.title }}</td>
-            <td>{{ album.artist }}</td>
-            <td>
-                <div class="row justify-content-start">
-                    <button class="col-md-5 btn button btn-success">Edit</button>
-                    <button :data-id= "album.id" @click="deleteItem" class="col-md-5 offset-md-1 btn button btn-danger">Delete</button>
-                </div>
-            </td>
+                <td>{{ album.title }}</td>
+                <td>{{ album.artist }}</td>
+                <td>
+                    <button :data-id= "album.id" @click="deleteItem" class="btn button btn-danger">x</button>
+                </td>
             </tr>
         </tbody>
     </table>
