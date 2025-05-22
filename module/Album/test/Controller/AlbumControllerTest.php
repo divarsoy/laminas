@@ -185,4 +185,86 @@ class AlbumControllerTest extends AbstractHttpControllerTestCase
         $this->dispatch('/album/apiAdd');
         $this->assertResponseStatusCode(Response::STATUS_CODE_200);
     }
+    public function testAPIAddEndpointShouldThrowValidationErrorOnTitleWithMoreThanHundredCharacters()
+    {
+        $data = [
+            'title' => 'Title with more than 100 characters, Title with more than 100 characters, Title with more than 100 ch',
+            'artist' => 'Ane Brun'
+        ];
+           
+        $this->getRequest()
+            ->setMethod('POST')
+            ->setContent(json_encode($data))
+            ->getHeaders()->addHeaderLine('Content-Type', 'application/json');
+
+        $this->dispatch('/album/apiAdd');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_400);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame(json_encode([
+            "error" => [
+                "title" => [
+                    "stringLengthTooLong" => "The input is more than 100 characters long"
+                ]
+            ]
+        ]), $response);
+    }
+
+    public function testAPIAddEndpointShouldThrowValidationErrorOnArtistWithMoreThanHundredCharacters()
+    {
+        $data = [
+            'title' => 'It all starts with one',
+            'artist' => 'Artist with more than 100 characters, Artist with more than 100 characters, Artist with more than 100',
+        ];
+           
+        $this->getRequest()
+            ->setMethod('POST')
+            ->setContent(json_encode($data))
+            ->getHeaders()->addHeaderLine('Content-Type', 'application/json');
+
+        $this->dispatch('/album/apiAdd');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_400);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame(json_encode([
+            "error" => [
+                "artist" => [
+                    "stringLengthTooLong" => "The input is more than 100 characters long"
+                ]
+            ]
+        ]), $response);
+    }
+
+    public function testAPIIndexEndpointShouldReturnEmptyResultsSuccessfully()
+    {
+        $this->albumTable->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([]);   
+        
+        $this->getRequest()
+            ->setMethod('GET')
+            ->getHeaders()->addHeaderLine('Content-Type', 'application/json');
+
+        $this->dispatch('/album/api');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_200);
+    }
+    public function testAPIIndexEndpointShouldReturnListOfAlbumSuccessfully()
+    {
+        $album = new Album();
+        $data = [
+            'id' => 1,
+            'title' => 'It all starts with one',
+            'artist' => 'Ane Brun',
+        ];
+        $album->exchangeArray($data);
+        $this->albumTable->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([$album]);   
+        
+        $this->getRequest()
+            ->setMethod('GET')
+            ->getHeaders()->addHeaderLine('Content-Type', 'application/json');
+
+        $this->dispatch('/album/api');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_200);
+        $this->assertSame(json_encode([$data]), $this->getResponse()->getContent());
+    }
 }
