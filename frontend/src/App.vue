@@ -40,7 +40,7 @@
 </template>
   
 <script setup>
-    import { reactive, ref } from 'vue'
+    import { reactive, ref, onMounted } from 'vue'
     const artist = ref('');
     const title = ref('');
 
@@ -48,7 +48,9 @@
         albums: []
     });
 
-    fetchAlbums();
+    onMounted(() => {
+        fetchAlbums();
+    })
 
     async function fetchAlbums() {
         try {
@@ -71,7 +73,10 @@
         }
         try {
             const response = await fetch('/album/apiAdd', requestOptions);
-            await response.json();
+            const result = await response.json();
+            if(response.status === 400) {
+                console.error('Validation error:', result);
+            }
             title.value = '';
             artist.value = '';
             await fetchAlbums();
