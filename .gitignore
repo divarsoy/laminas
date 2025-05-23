@@ -12,3 +12,4 @@ frontend/node_modules/
 /public/assets
 /public/frontend
 /data/laminastutorial.db
+/data/apartments.db

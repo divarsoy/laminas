@@ -29,13 +29,15 @@
     "autoload": {
         "psr-4": {
             "Application\\": "module/Application/src/",
-            "Album\\": "module/Album/src/"
+            "Album\\": "module/Album/src/",
+            "Apartment\\": "module/Apartment/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "ApplicationTest\\": "module/Application/test/",
-            "AlbumTest\\": "module/Album/test/"
+            "AlbumTest\\": "module/Album/test/",
+            "ApartmentTest\\": "module/Apartment/test/"
         }
     },
     "scripts": {
