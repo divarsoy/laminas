@@ -25,5 +25,8 @@
         <testsuite name="Album">
             <directory>./module/Album/test</directory>
         </testsuite>
+                <testsuite name="Apartment">
+            <directory>./module/Apartment/test</directory>
+        </testsuite>
     </testsuites>
 </phpunit>
