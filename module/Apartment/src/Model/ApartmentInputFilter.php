@@ -15,7 +15,13 @@ class ApartmentInputFilter extends InputFilter
             'validators' => [
                 [
                     'name' => 'NotEmpty',
-                    'options' => ['message' => "'Name' is required"],
+                ],
+                [
+                    'name' => 'StringLength',
+                    'options' => [
+                        'min' => 1,
+                        'max' => 255,
+                    ],
                 ],
             ],
         ]);
@@ -29,7 +35,13 @@ class ApartmentInputFilter extends InputFilter
             'validators' => [
                 [
                     'name' => 'NotEmpty',
-                    'options' => ['message' => "'City' is required"],
+                ],
+                [
+                    'name' => 'StringLength',
+                    'options' => [
+                        'min' => 1,
+                        'max' => 100,
+                    ],
                 ],
             ],
         ]);

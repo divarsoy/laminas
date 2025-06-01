@@ -80,4 +80,214 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
         $this->assertControllerClass('ApartmentController');
         $this->assertMatchedRouteName('apartments');
     }
+
+    public function testGeActionCanBeAccessedSuccessfully()
+    {
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(new Apartment(1, 'Test Apartment 1', 'London'));
+
+            $this->dispatch('/apartments/1', 'GET');
+            $this->assertResponseStatusCode(Response::STATUS_CODE_200);
+            $this->assertModuleName('Apartment');
+            $this->assertControllerName(ApartmentController::class);
+            $this->assertMatchedRouteName('apartments');
+    }
+    public function testGetActionWillReturnNotFoundWhenApartmentDoesNotExist()
+    {
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+
+        $this->dispatch('/apartments/1', 'GET');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_404);
+    }
+
+    public function testCreateActionWillReturnApartmentOnSuccess()
+    {
+        $this->repository->expects($this->once())
+            ->method('insert')
+            ->with($this->isInstanceOf(Apartment::class))
+            ->willReturn(1);
+
+        $this->dispatch('/apartments', 'POST', [
+            'name' => 'Test Apartment 1',
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_201);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame(json_encode([
+            'id' => 1,
+            'name' => 'Test Apartment 1',
+            'city' => 'London'
+        ]), $response);
+        $this->assertModuleName('Apartment');
+        $this->assertControllerName(ApartmentController::class);
+        $this->assertControllerClass('ApartmentController');
+        $this->assertMatchedRouteName('apartments');
+    }
+
+
+    public function testCreateActionWillReturnValidationErrorIfNameIsMissing()
+    {
+        $this->dispatch('/apartments', 'POST', [
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame('{"errors":{"name":{"isEmpty":"Value is required and can\u0027t be empty"}}}', $response);
+    }
+
+    public function testCreateActionWillReturnValidationErrorIfCityIsMissing()
+    {
+        $this->dispatch('/apartments', 'POST', [
+            'name' => 'Test Apartment 1'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame('{"errors":{"city":{"isEmpty":"Value is required and can\u0027t be empty"}}}', $response);
+    }
+
+    public function testCreateActionWillReturnValidationErrorIfNameIsLongerThan255Characters()
+    {
+        $longString = 'Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name';
+        $this->dispatch('/apartments', 'POST', [
+            'name' => $longString,
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getREsponse()->getContent();
+        $this->assertSame(json_encode([
+            'errors' => [
+                'name' => [
+                    'stringLengthTooLong' => 'The input is more than 255 characters long'
+                ]
+            ]
+        ]), $response);
+    }
+
+    public function testCreateActionWillReturnValidationErrorIfCityIsLongerThan100Characters()
+    {
+        $longString = 'City with more than 100 characters, City with more than 100 characters, City with more than 100 chara';
+        $this->dispatch('/apartments', 'POST', [
+            'name' => 'Test Apartment 1',
+            'city' => $longString
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getREsponse()->getContent();
+        $this->assertSame(json_encode([
+            'errors' => [
+                'city' => [
+                    'stringLengthTooLong' => 'The input is more than 100 characters long'
+                ]
+            ]
+        ]), $response);
+    }
+
+
+    public function testUpdateActionWillUpdateOnSuccess()
+    {
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(new Apartment('London', 'Test Apartment 1', 1));
+
+        $this->repository->expects($this->once())
+            ->method('update')
+            ->with($this->callback(function($apartment) {
+                return $apartment instanceof Apartment 
+                    && (int) $apartment->getId() === 1
+                    && $apartment->getName() === 'Test Apartment 2'
+                    && $apartment->getCity() === 'London';
+            }));
+
+        $this->dispatch('/apartments/1', 'PUT', [
+            'name' => 'Test Apartment 2', 
+            'city' => 'London' 
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_200);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame(json_encode(['status' => 'updated']), $response);
+    }
+
+    public function testUpdateActionWillReturnValidationErrorIfNameIsMissing()
+    {
+        $this->dispatch('/apartments/1', 'PUT', [
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame('{"errors":{"name":{"isEmpty":"Value is required and can\u0027t be empty"}}}', $response);
+    }
+
+    public function testUpdateActionWillReturnValidationErrorIfCityIsMissing()
+    {
+        $this->dispatch('/apartments/1', 'PUT', [
+            'name' => 'Test Apartment 1'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getResponse()->getContent();
+        $this->assertSame('{"errors":{"city":{"isEmpty":"Value is required and can\u0027t be empty"}}}', $response);
+    }
+
+    public function testUpdateActionWillReturnValidationErrorIfNameIsLongerThan255Characters()
+    {
+        $longString = 'Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name';
+        $this->dispatch('/apartments/1', 'PUT', [
+            'name' => $longString,
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getREsponse()->getContent();
+        $this->assertSame(json_encode([
+            'errors' => [
+                'name' => [
+                    'stringLengthTooLong' => 'The input is more than 255 characters long'
+                ]
+            ]
+        ]), $response);
+    }
+
+    public function testUpdateActionWillReturnValidationErrorIfCityIsLongerThan100Characters()
+    {
+        $longString = 'City with more than 100 characters, City with more than 100 characters, City with more than 100 chara';
+        $this->dispatch('/apartments/1', 'PUT', [
+            'name' => 'Test Apartment 1',
+            'city' => $longString
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_422);
+        $response = $this->getREsponse()->getContent();
+        $this->assertSame(json_encode([
+            'errors' => [
+                'city' => [
+                    'stringLengthTooLong' => 'The input is more than 100 characters long'
+                ]
+            ]
+        ]), $response);
+    }
+
+    public function testUpdateActionWillReturnNotFoundWhenApartmentDoesNotExist()
+    {
+        $this->repository->expects($this->once())
+            ->method('find')
+            ->with(1)
+            ->willReturn(null);
+
+        $this->dispatch('/apartments/1', 'PUT', [
+            'name' => 'Test Apartment 1',
+            'city' => 'London'
+        ]);
+        $this->assertResponseStatusCode(Response::STATUS_CODE_404);
+    }
+
+    public function testDeleteActionWillReturn204Successfully()
+    {
+        $this->repository->expects($this->once())
+            ->method('delete')
+            ->with(1);
+        $this->dispatch('/apartments/1', 'DELETE');
+        $this->assertResponseStatusCode(Response::STATUS_CODE_204);
+    }
 }
