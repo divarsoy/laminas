@@ -35,14 +35,16 @@ class Apartment
         $this->name = !empty($array['name']) ? $array['name'] : null;
         $this->city = !empty($array['city']) ? $array['city']: null;
     }
+
     public function getArrayCopy()
     {
         return [
             'id' => $this->id,
-            'artist' => $this->name,
-            'title' => $this->city,
+            'name' => $this->name,
+            'city' => $this->city,
         ];
     }
+
     public function toArray()
     {
         return [
