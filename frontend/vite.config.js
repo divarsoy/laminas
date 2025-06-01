@@ -18,7 +18,16 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/album/api': 'http://localhost:8080'  // Point to Laminas dev server if needed
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/album/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+        secure: false,
+      }
     }
   }
 })
