@@ -73,7 +73,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
             ->method('findAll')
             ->willReturn($resultSet);
 
-        $this->dispatch('/apartments', 'GET');
+        $this->dispatch('/api/apartments', 'GET');
         $this->assertResponseStatusCode(Response::STATUS_CODE_200);
         $this->assertModuleName('Apartment');
         $this->assertControllerName(ApartmentController::class);
@@ -88,7 +88,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
             ->with(1)
             ->willReturn(new Apartment(1, 'Test Apartment 1', 'London'));
 
-            $this->dispatch('/apartments/1', 'GET');
+            $this->dispatch('/api/apartments/1', 'GET');
             $this->assertResponseStatusCode(Response::STATUS_CODE_200);
             $this->assertModuleName('Apartment');
             $this->assertControllerName(ApartmentController::class);
@@ -101,7 +101,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
             ->with(1)
             ->willReturn(null);
 
-        $this->dispatch('/apartments/1', 'GET');
+        $this->dispatch('/api/apartments/1', 'GET');
         $this->assertResponseStatusCode(Response::STATUS_CODE_404);
     }
 
@@ -112,7 +112,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
             ->with($this->isInstanceOf(Apartment::class))
             ->willReturn(1);
 
-        $this->dispatch('/apartments', 'POST', [
+        $this->dispatch('/api/apartments', 'POST', [
             'name' => 'Test Apartment 1',
             'city' => 'London'
         ]);
@@ -132,7 +132,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateActionWillReturnValidationErrorIfNameIsMissing()
     {
-        $this->dispatch('/apartments', 'POST', [
+        $this->dispatch('/api/apartments', 'POST', [
             'city' => 'London'
         ]);
         $this->assertResponseStatusCode(Response::STATUS_CODE_422);
@@ -142,7 +142,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
 
     public function testCreateActionWillReturnValidationErrorIfCityIsMissing()
     {
-        $this->dispatch('/apartments', 'POST', [
+        $this->dispatch('/api/apartments', 'POST', [
             'name' => 'Test Apartment 1'
         ]);
         $this->assertResponseStatusCode(Response::STATUS_CODE_422);
@@ -153,7 +153,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
     public function testCreateActionWillReturnValidationErrorIfNameIsLongerThan255Characters()
     {
         $longString = 'Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name';
-        $this->dispatch('/apartments', 'POST', [
+        $this->dispatch('/api/apartments', 'POST', [
             'name' => $longString,
             'city' => 'London'
         ]);
@@ -171,7 +171,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
     public function testCreateActionWillReturnValidationErrorIfCityIsLongerThan100Characters()
     {
         $longString = 'City with more than 100 characters, City with more than 100 characters, City with more than 100 chara';
-        $this->dispatch('/apartments', 'POST', [
+        $this->dispatch('/api/apartments', 'POST', [
             'name' => 'Test Apartment 1',
             'city' => $longString
         ]);
@@ -203,7 +203,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
                     && $apartment->getCity() === 'London';
             }));
 
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'name' => 'Test Apartment 2', 
             'city' => 'London' 
         ]);
@@ -214,7 +214,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
 
     public function testUpdateActionWillReturnValidationErrorIfNameIsMissing()
     {
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'city' => 'London'
         ]);
         $this->assertResponseStatusCode(Response::STATUS_CODE_422);
@@ -224,7 +224,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
 
     public function testUpdateActionWillReturnValidationErrorIfCityIsMissing()
     {
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'name' => 'Test Apartment 1'
         ]);
         $this->assertResponseStatusCode(Response::STATUS_CODE_422);
@@ -235,7 +235,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
     public function testUpdateActionWillReturnValidationErrorIfNameIsLongerThan255Characters()
     {
         $longString = 'Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name with more than 255 characters, Name';
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'name' => $longString,
             'city' => 'London'
         ]);
@@ -253,7 +253,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
     public function testUpdateActionWillReturnValidationErrorIfCityIsLongerThan100Characters()
     {
         $longString = 'City with more than 100 characters, City with more than 100 characters, City with more than 100 chara';
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'name' => 'Test Apartment 1',
             'city' => $longString
         ]);
@@ -275,7 +275,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
             ->with(1)
             ->willReturn(null);
 
-        $this->dispatch('/apartments/1', 'PUT', [
+        $this->dispatch('/api/apartments/1', 'PUT', [
             'name' => 'Test Apartment 1',
             'city' => 'London'
         ]);
@@ -287,7 +287,7 @@ class ApartmentControllerTest extends AbstractHttpControllerTestCase
         $this->repository->expects($this->once())
             ->method('delete')
             ->with(1);
-        $this->dispatch('/apartments/1', 'DELETE');
+        $this->dispatch('/api/apartments/1', 'DELETE');
         $this->assertResponseStatusCode(Response::STATUS_CODE_204);
     }
 }

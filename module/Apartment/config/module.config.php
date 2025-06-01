@@ -17,7 +17,7 @@ return [
             'apartments' => [
                 'type' => Segment::class,
                 'options' => [
-                    'route' => '/apartments[/:id]',
+                    'route' => '/api/apartments[/:id]',
                     'constraints' => [
                         'id' => '[0-9]+',
                     ],
