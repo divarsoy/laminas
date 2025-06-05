@@ -4,11 +4,13 @@ import path from 'path'
 
 export default defineConfig({
   plugins: [vue()],
+  base: '/frontend/',
   build: {
     outDir: '../public/frontend',
     emptyOutDir: true,
+
     rollupOptions: {
-      input: './index.html'
+      input: './index.html',
     }
   },
   resolve: {
