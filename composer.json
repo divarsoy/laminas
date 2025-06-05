@@ -20,6 +20,7 @@
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+        "laminas/laminas-cli": "^1.11",
         "laminas/laminas-test": "^4.12",
         "phpunit/phpunit": "^10.4",
         "psalm/plugin-phpunit": "^0.19.0",
@@ -30,14 +31,17 @@
         "psr-4": {
             "Application\\": "module/Application/src/",
             "Album\\": "module/Album/src/",
-            "Apartment\\": "module/Apartment/src"
+            "Apartment\\": "module/Apartment/src",
+            "ApartmentGenerator\\": "module/ApartmentGenerator/src",
+            "Property\\": "module/Property/src"
         }
     },
     "autoload-dev": {
         "psr-4": {
             "ApplicationTest\\": "module/Application/test/",
             "AlbumTest\\": "module/Album/test/",
-            "ApartmentTest\\": "module/Apartment/test/"
+            "ApartmentTest\\": "module/Apartment/test/",
+            "PropertyTest\\": "module/Property/test/"
         }
     },
     "scripts": {

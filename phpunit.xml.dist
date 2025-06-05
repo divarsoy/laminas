@@ -25,8 +25,11 @@
         <testsuite name="Album">
             <directory>./module/Album/test</directory>
         </testsuite>
-                <testsuite name="Apartment">
+        <testsuite name="Apartment">
             <directory>./module/Apartment/test</directory>
+        </testsuite>
+        <testsuite name="Property">
+            <directory>./module/Property/test</directory>
         </testsuite>
     </testsuites>
 </phpunit>

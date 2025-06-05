@@ -17,4 +17,6 @@ return [
     'Application',
     'Album',
     'Apartment',
+    'ApartmentGenerator',
+    'Property',
 ];
