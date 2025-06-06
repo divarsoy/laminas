@@ -62,7 +62,9 @@ class PropertyControllerTest extends AbstractHttpControllerTestCase
                 'location_id' => '1',
                 'emission' => "6.21kg CO2e",
                 'rate' => 129,
-                'imageurl' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400'
+                'imageurl' => 'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+                'area' => 'Camden',
+                'city' => 'London'
             ],
             [
                 'id' => 2,
@@ -70,7 +72,9 @@ class PropertyControllerTest extends AbstractHttpControllerTestCase
                 'location_id' => '2',
                 'emission' => "8.54kg CO2e",
                 'rate' => null,
-                'imageurl' => 'https://images.unsplash.com/photo-1515263487990-61b07816b324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400'
+                'imageurl' => 'https://images.unsplash.com/photo-1515263487990-61b07816b324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+                'area' => 'Aldgate',
+                'city' => 'London'
             ]
         ]);
 

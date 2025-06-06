@@ -9,8 +9,10 @@ class Property
     private $emission;
     private $rate;
     private $imageurl;
+    private $city;
+    private $area;
 
-    public function __construct($name, $location_id, $emission, $imageurl, $rate=null, $id=null)
+    public function __construct($name, $location_id, $emission, $imageurl, $city, $area, $rate=null, $id=null)
     {
         $this->id = $id;
         $this->name = $name;
@@ -18,6 +20,8 @@ class Property
         $this->emission = $emission;
         $this->rate = $rate;
         $this->imageurl = $imageurl;
+        $this->city = $city;
+        $this->area = $area;
     }
 
     public function getId()
@@ -50,6 +54,16 @@ class Property
         return $this->imageurl;
     }
 
+    public function getCity()
+    {
+        return $this->city;
+    }
+
+    public function getArea()
+    {
+        return $this->area;
+    }
+
     public function exchangeArray(array $array)
     {
         $this->id = !empty($array['id']) ? $array['id'] : null;
@@ -58,6 +72,9 @@ class Property
         $this->emission = !empty($array['emission']) ? $array['emission']: null;
         $this->rate = !empty($array['rate']) ? $array['rate']: null;
         $this->imageurl = !empty($array['imageurl']) ? $array['imageurl']: null;
+        $this->city = !empty($array['city']) ? $array['city']: null;
+        $this->area = !empty($array['area']) ? $array['area']: null;
+
     }
 
     public function getArrayCopy()
@@ -68,7 +85,9 @@ class Property
             'location_id' => $this->location_id,
             'emission' => $this->emission,
             'rate' => $this->rate,
-            'imageurl' => $this->imageurl
+            'imageurl' => $this->imageurl,
+            'city' => $this->city,
+            'area' => $this->area,
         ];
     }
 }

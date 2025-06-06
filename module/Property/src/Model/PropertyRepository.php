@@ -28,7 +28,8 @@ class PropertyRepository implements PropertyRepositoryInterface
     {
         $select = $this->sql->select()
             ->columns(['id', 'name', 'location_id', 'emission', 'rate', 'imageurl'])
-            ->from(self::PROPERTY);
+            ->from(self::PROPERTY)
+            ->join('location','location_id=location.id',['area', 'city']);
         $statement = $this->sql->prepareStatementForSqlObject($select);
         $result = $statement->execute();
 

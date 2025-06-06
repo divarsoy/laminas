@@ -17,7 +17,7 @@ class PropertyRepositoryTest extends TestCase
     {
 
         $hydrator = new ArraySerializableHydrator();
-        $apartment = new Property(null, null, null, null, null, null);
+        $apartment = new Property(null, null, null, null, null, null, null, null);
         $result = $this->createMock(ResultInterface::class);
         $sql = $this->createMock(Sql::class);
         $statement = $this->createMock(StatementInterface::class);
@@ -35,6 +35,11 @@ class PropertyRepositoryTest extends TestCase
         $select->expects($this->once())
             ->method('from')
             ->with('property')
+            ->willReturnSelf();
+
+        $select->expects($this->once())
+            ->method('join')
+            ->with('location','location_id=location.id',['area', 'city'])
             ->willReturnSelf();
 
         $sql->expects($this->once())
