@@ -16,7 +16,11 @@
         "laminas/laminas-mvc": "^3.7.0",
         "laminas/laminas-skeleton-installer": "^1.3.0",
         "laminas/laminas-db": "^2.20.0",
-        "laminas/laminas-mvc-form": "^2.1.0"
+        "laminas/laminas-mvc-form": "^2.1.0",
+        "nesbot/carbon": "^3.9",
+        "nyholm/psr7": "^1.8",
+        "opensearch-project/opensearch-php": "^2.4",
+        "symfony/http-client": "^7.3"
     },
     "require-dev": {
         "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
@@ -33,7 +37,8 @@
             "Album\\": "module/Album/src/",
             "Apartment\\": "module/Apartment/src",
             "ApartmentGenerator\\": "module/ApartmentGenerator/src",
-            "Property\\": "module/Property/src"
+            "Property\\": "module/Property/src",
+            "OpenSearchService\\": "module/OpenSearchService/src"
         }
     },
     "autoload-dev": {
@@ -79,9 +84,10 @@
     "config": {
         "sort-packages": true,
         "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true,
             "laminas/laminas-component-installer": true,
             "laminas/laminas-skeleton-installer": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true
+            "php-http/discovery": true
         }
     }
 }

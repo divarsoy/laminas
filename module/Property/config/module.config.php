@@ -27,6 +27,16 @@ return [
                     ],
                 ],
             ],
+            'properties-search' => [
+                'type' => Literal::class,
+                'options' => [
+                    'route' => '/api/properties/search',
+                    'defaults' => [
+                        'controller' => PropertyController::class,
+                        'action' => 'search'
+                    ],
+                ],
+            ],
         ],
     ],
 
