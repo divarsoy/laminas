@@ -24,7 +24,12 @@ Class PropertyController extends AbstractActionController
 
     public function searchAction()
     {
-        $results = $this->openSearchService->searchAll();
-        return new JsonModel($results);
+        $queryParams = $this->params()->fromQuery();
+        $response = $this->openSearchService->search($queryParams);
+        return new JsonModel([
+            'results' => $response['results'],
+            'facets' => $response['facets'],
+            'total' => $response['total']
+        ]);
     }
 }
