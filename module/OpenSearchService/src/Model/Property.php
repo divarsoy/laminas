@@ -13,7 +13,7 @@ class Property
     public string $apartment_type;
     public float $rate;
     public array $location; // geo_point as ['lat' => float, 'lon' => float]
-    public int $available;
+    public bool $available;
     public int $rating;
     public array $apartment_facilities;
     public array $kitchen_facilities;
@@ -111,7 +111,7 @@ class Property
         $this->apartment_type = $this->randomApartmentType();
         $this->rate = $this->randomRate();
         $this->location = $this->randomLocationForCity($this->city);
-        $this->available = rand(0, 1);
+        $this->available = (bool) rand(0, 1);
         $this->rating = rand(1, 5);
         $this->apartment_facilities = $this->randomSubset(self::$apartmentFacilitiesPool);
         $this->kitchen_facilities = $this->randomSubset(self::$kitchenFacilitiesPool);
