@@ -33,6 +33,8 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $this->createIndexIfDoesNotExist();
+
         if(!$input->hasArgument(1)){
             $this->generateDummyData(100000,50);
         }
@@ -48,8 +50,6 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
                 $output->writeln("<error>Invalid JSON in file: $filePath</error>");
                 return 1;
             }
-
-            $this->createIndexIfDoesNotExist();
 
             $index = 'properties';
             foreach ($data as $property) {
@@ -111,8 +111,7 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
     }
 
     protected function generateDummyData(int $totalProperties = 1000, int $bulkSize = 50) {
-        $indexName = 'properties';
-        $propertyGenerator = new Property();
+        $indexName = self::INDEX_NAME;
         $count = 0;
     
         $startDate = Carbon::create(2025, 1, 1);
@@ -122,14 +121,14 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
         $bulkParams = ['body' => []];
     
         for ($propertyId = 1; $propertyId <= $totalProperties; $propertyId++) {
-            $baseRecord = $propertyGenerator->toArray();
+            $property = new Property();
+            $baseRecord = $property->toArray();
             $baseRecord['property_id'] = $propertyId;
             $baseRecord['apartment_id'] = $propertyId;
     
             foreach ($period as $date) {
                 $record = $baseRecord;
                 $record['date'] = $date->format('Y-m-d');
-                $record['available'] = rand(0, 1);
     
                 $recordId = sprintf('%d_%d_%s', $record['property_id'], $record['apartment_id'], $record['date']);
     
@@ -144,9 +143,27 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
                 $count++;
     
                 if ($count % $bulkSize === 0) {
-                    $response = $this->client->bulk($bulkParams);
-                    if ($response['errors']) {
-                        echo "Bulk insert errors occurred at record $count\n";
+                    try {
+                        $response = $this->client->bulk($bulkParams);
+                        if ($response['errors']) {
+                            echo "Bulk insert errors occurred at record $count\n";
+                            foreach ($response['items'] as $item) {
+                                if (isset($item['index']['error'])) {
+                                    $error = $item['index']['error'];
+                                    $docId = $item['index']['_id'];
+                                    echo "Error for document $docId:\n";
+                                    echo "  Type: " . ($error['type'] ?? 'Unknown') . "\n";
+                                    echo "  Reason: " . ($error['reason'] ?? 'Unknown') . "\n";
+                                    if (isset($error['caused_by'])) {
+                                        echo "  Caused by: " . $error['caused_by']['reason'] . "\n";
+                                    }
+                                    echo "\n";
+                                }
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        echo "Error during bulk insert at record $count: " . $e->getMessage() . "\n";
+                        echo "Stack trace: " . $e->getTraceAsString() . "\n";
                     }
 
                     $bulkParams = ['body' => []];
