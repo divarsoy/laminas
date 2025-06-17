@@ -94,6 +94,7 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
                             'available' => ['type' => 'boolean'],
                             'rating' => ['type' => 'integer'],
                             'location' => ['type' => 'geo_point'],
+                            'image_url' => ['type' => 'keyword'],
                             'apartment_facilities' => ['type' => 'keyword'],
                             'kitchen_facilities' => ['type' => 'keyword'],
                             'building_facilities' => ['type' => 'keyword'],

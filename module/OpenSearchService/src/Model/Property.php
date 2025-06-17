@@ -15,6 +15,7 @@ class Property
     public array $location; // geo_point as ['lat' => float, 'lon' => float]
     public bool $available;
     public int $rating;
+    public string $imageUrl;
     public array $apartment_facilities;
     public array $kitchen_facilities;
     public array $building_facilities;
@@ -91,11 +92,44 @@ class Property
     ];
 
     private static array $apartmentTypes = [
-        "StudioApartment",
-        "1BedroomApartment",
-        "2BedroomApartment",
-        "3BedroomApartment",
-        "Penthouse"
+        "studio_apartment",
+        "1_bedroom_apartment",
+        "2_bedroom_apartment",
+        "3_bedroom_apartment",
+        "penthouse"
+    ];
+
+    private static array $imageUrls = [
+        'https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1515263487990-61b07816b324?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwzfHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1460317442991-0ec209397118?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw0fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw1fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1523192193543-6e7296d960e4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw2fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1493809842364-78817add7ffb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw3fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1502672023488-70e25813eb80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw4fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHw5fHxhcGFydG1lbnR8ZW58MHx8fHwxNzQ4ODg2MTU3fDA&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1459767129954-1b1c1f9b9ace?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxMHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxMXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1580216643062-cf460548a66a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxMnx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1628592102751-ba83b0314276?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxM3x8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1630699144867-37acec97df5a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxNHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxNXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1484154218962-a197022b5858?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxNnx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1580041065738-e72023775cdc?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxN3x8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1579632652768-6cb9dcf85912?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxOHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1560440021-33f9b867899d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwxOXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1556020685-ae41abfc9365?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyMHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1630699375895-fe5996d163ee?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyMXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1497366754035-f200968a6e72?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyMnx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1536376072261-38c75010e6c9?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyM3x8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1612320648993-61c1cd604b71?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyNHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1493606371202-6275828f90f3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyNXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1595039357995-905cad2933e3?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyNnx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1525438160292-a4a860951216?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyN3x8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1630699376289-b62375a35505?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyOHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1433849665221-d2f93042ae54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyOXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
+        'https://images.unsplash.com/photo-1558778909-1d4ea850da7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwzMHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400'
     ];
 
     public function __construct()
@@ -119,6 +153,7 @@ class Property
         $this->building_type = $this->randomSubset(self::$buildingTypePool, 1);
         $this->health_and_safety_facilities = $this->randomSubset(self::$healthAndSafetyFacilitiesPool);
         $this->sustainability = $this->randomSubset(self::$sustainabilityPool);
+        $this->imageUrl = $this->randomImageUrl();
     }
 
     private function randomName(): string
@@ -199,6 +234,11 @@ class Property
         return $min + mt_rand() / mt_getrandmax() * ($max - $min);
     }
 
+    private function randomImageUrl(): string
+    {
+        return self::$imageUrls[array_rand(self::$imageUrls)];
+    }
+
     private function randomSubset(array $pool, int $maxCount = null): array
     {
         $count = $maxCount ?? rand(1, max(1, floor(count($pool)/2)));
@@ -221,6 +261,7 @@ class Property
             'location' => $this->location,
             'available' => $this->available,
             'rating' => $this->rating,
+            'image_url' => $this->imageUrl,
             'apartment_facilities' => $this->apartment_facilities,
             'kitchen_facilities' => $this->kitchen_facilities,
             'building_facilities' => $this->building_facilities,
