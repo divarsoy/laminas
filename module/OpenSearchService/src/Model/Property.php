@@ -16,6 +16,7 @@ class Property
     public bool $available;
     public int $rating;
     public string $imageUrl;
+    public float $emission;
     public array $apartment_facilities;
     public array $kitchen_facilities;
     public array $building_facilities;
@@ -147,6 +148,7 @@ class Property
         $this->location = $this->randomLocationForCity($this->city);
         $this->available = (bool) rand(0, 1);
         $this->rating = rand(1, 5);
+        $this->emission = $this->randomEmission();
         $this->apartment_facilities = $this->randomSubset(self::$apartmentFacilitiesPool);
         $this->kitchen_facilities = $this->randomSubset(self::$kitchenFacilitiesPool);
         $this->building_facilities = $this->randomSubset(self::$buildingFacilitiesPool);
@@ -154,6 +156,7 @@ class Property
         $this->health_and_safety_facilities = $this->randomSubset(self::$healthAndSafetyFacilitiesPool);
         $this->sustainability = $this->randomSubset(self::$sustainabilityPool);
         $this->imageUrl = $this->randomImageUrl();
+
     }
 
     private function randomName(): string
@@ -246,6 +249,11 @@ class Property
         return array_slice($pool, 0, $count);
     }
 
+    private function randomEmission(): float
+    {
+        return round(rand(0, 20) + (rand(0, 99) / 100), 2);
+    }
+
     public function toArray(): array
     {
         return [
@@ -261,6 +269,7 @@ class Property
             'location' => $this->location,
             'available' => $this->available,
             'rating' => $this->rating,
+            'emission' => $this->emission,
             'image_url' => $this->imageUrl,
             'apartment_facilities' => $this->apartment_facilities,
             'kitchen_facilities' => $this->kitchen_facilities,

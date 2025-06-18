@@ -93,6 +93,7 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
                             'rate' => ['type' => 'float'],
                             'available' => ['type' => 'boolean'],
                             'rating' => ['type' => 'integer'],
+                            'emission' => ['type' => 'float'],
                             'location' => ['type' => 'geo_point'],
                             'image_url' => ['type' => 'keyword'],
                             'apartment_facilities' => ['type' => 'keyword'],
