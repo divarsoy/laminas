@@ -110,6 +110,12 @@ class OpenSearchService
             'apartment_type' => ['terms' => ['field' => 'apartment_type']],
             'cities' => ['terms' => ['field' => 'city']],
             'building_type' => ['terms' => ['field' => 'building_type']],
+            'apartment_facilities' => ['terms' => ['field' => 'apartment_facilities']],
+            'kitchen_facilities' => ['terms' => ['field' => 'kitchen_facilities']],
+            'building_facilities' => ['terms' => ['field' => 'building_facilities']],
+            'health_and_safety_facilities' => ['terms' => ['field' => 'health_and_safety_facilities']],
+            'sustainability' => ['terms' => ['field' => 'sustainability']],
+
             'rate_ranges' => [
                 'range' => [
                     'field' => 'rate',
@@ -185,7 +191,7 @@ class OpenSearchService
                 }
             }
 
-            if( $end == null){
+            if ($end === null) {
                 $this->endDate = Carbon::now()->addDay();
             } else {
                 $this->endDate = new Carbon($end);
@@ -234,10 +240,20 @@ class OpenSearchService
     {
         // Facet filters
         foreach ($filters as $field => $value) {
-            if (is_array($value)) {
-                $this->filter[] = ['terms' => [$field => $value]];
-            } else {
-                $this->filter[] = ['term' => [$field => $value]];
+            try {
+                if (is_array($value)) {
+                    $this->filter[] = ['terms' => [$field => $value]];
+                } else {
+                    // Handle comma-separated values
+                    if (strpos($value, ',') !== false) {
+                        $values = array_map('trim', explode(',', $value));
+                        $this->filter[] = ['terms' => [$field => $values]];
+                    } else {
+                        $this->filter[] = ['term' => [$field => $value]];
+                    }
+                }
+            } catch (\Exception $e) {
+                error_log("Error parsing facet filter for field '$field' with value '$value': " . $e->getMessage());
             }
         }
     }
@@ -254,11 +270,13 @@ class OpenSearchService
 
     private function findApartmentsForDate(array $params, array $apartments, Carbon $date) {
         $dateString = $date->toDateString();
-        $params['body']['size'] = 20;
-        $params['body']['query']['bool']['filter'][] = [ "terms" => [ "apartment_id" => $apartments ]];
-        $params['body']['query']['bool']['filter'][] = [ "term" => [ "date" => $dateString ]];
+        
+        // Rebuild the parameters to ensure facets are calculated on the properly filtered dataset
+        $finalParams = $this->buildParams();
+        $finalParams['body']['query']['bool']['filter'][] = ["terms" => ["apartment_id" => $apartments]];
+        $finalParams['body']['query']['bool']['filter'][] = ["term" => ["date" => $dateString]];
 
-        return $this->client->search($params);
+        return $this->client->search($finalParams);
     }
 
 } 
