@@ -29,7 +29,7 @@ class OpenSearchParams
     {
         return [
             'apartment_type' => ['terms' => ['field' => 'apartment_type']],
-            'cities' => ['terms' => ['field' => 'city']],
+            'cities' => ['terms' => ['field' => 'city.raw']],
             'building_type' => ['terms' => ['field' => 'building_type']],
             'apartment_facilities' => ['terms' => ['field' => 'apartment_facilities']],
             'kitchen_facilities' => ['terms' => ['field' => 'kitchen_facilities']],

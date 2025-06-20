@@ -53,6 +53,9 @@
                 </div>
                 <div class="col-md-6">                
                 <div class="mb-3">
+                  <p class="text-muted">{{ property.description }}</p>
+                </div>
+                <div class="mb-3">
                     <h5>Property Details</h5>
                     <ul class="list-unstyled">
                     <li><strong>Area:</strong> {{ property.area }}, {{ property.city }}</li>
@@ -257,8 +260,13 @@ export default {
 }
 
 .modal-body img {
-  max-height: 300px;
+  width: 100%;
+  max-width: 100%;
+  height: 300px;
+  max-height: 400px;
   object-fit: cover;
+  display: block;
+  margin: 0 auto;
 }
 
 .badge {

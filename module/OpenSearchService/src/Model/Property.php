@@ -4,6 +4,7 @@ namespace OpenSearchService\Model;
 class Property
 {
     public string $name;
+    public string $description;
     public string $date;
     public int $apartment_id;
     public int $property_id;
@@ -132,10 +133,12 @@ class Property
         'https://images.unsplash.com/photo-1433849665221-d2f93042ae54?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwyOXx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400',
         'https://images.unsplash.com/photo-1558778909-1d4ea850da7d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NTkwNjV8MHwxfHNlYXJjaHwzMHx8YXBhcnRtZW50fGVufDB8fHx8MTc0ODg4NjE1N3ww&ixlib=rb-4.1.0&q=80&w=400'
     ];
+    
 
     public function __construct()
     {
         $this->name = $this->randomName();
+        $this->description = $this->randomDescription();
         $this->date = $this->randomDate('2025-01-01', '2025-12-31');
         $this->apartment_id = rand(1000, 9999);
         $this->property_id = rand(1, 100);
@@ -156,7 +159,6 @@ class Property
         $this->health_and_safety_facilities = $this->randomSubset(self::$healthAndSafetyFacilitiesPool);
         $this->sustainability = $this->randomSubset(self::$sustainabilityPool);
         $this->imageUrl = $this->randomImageUrl();
-
     }
 
     private function randomName(): string
@@ -254,10 +256,28 @@ class Property
         return round(rand(0, 20) + (rand(0, 99) / 100), 2);
     }
 
+    private function randomDescription(): string
+    {
+        $descriptions = [
+            "A beautiful and spacious apartment in the heart of the city.",
+            "Modern living with all the amenities you need.",
+            "Perfect for families or business travelers.",
+            "Enjoy stunning views and a convenient location.",
+            "Recently renovated with stylish furnishings.",
+            "Close to public transport, shops, and restaurants.",
+            "A quiet retreat with lots of natural light.",
+            "Luxury apartment with top-notch facilities.",
+            "Affordable comfort in a great neighborhood.",
+            "Experience city life at its best in this lovely property."
+        ];
+        return $descriptions[array_rand($descriptions)];
+    }
+
     public function toArray(): array
     {
         return [
             'name' => $this->name,
+            'description' => $this->description,
             'date' => $this->date,
             'apartment_id' => $this->apartment_id,
             'property_id' => $this->property_id,

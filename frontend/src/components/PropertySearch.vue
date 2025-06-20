@@ -11,7 +11,7 @@
               type="text" 
               class="form-control" 
               v-model="searchParams.q" 
-              placeholder="Search properties..."
+              placeholder="Search area, city or description"
             >
           </div>
           <div class="col-md-3">
@@ -238,7 +238,7 @@ export default {
         Object.entries(selectedFacets.value).forEach(([facet, values]) => {
           if (facet !== 'rate_ranges' && values.length > 0) {
             const fieldMapping = {
-              'cities': 'city',
+              'cities': 'city.raw',
               'apartment_type': 'apartment_type',
               'building_type': 'building_type',
               'apartment_facilities': 'apartment_facilities',

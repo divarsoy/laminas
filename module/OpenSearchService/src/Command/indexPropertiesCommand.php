@@ -82,12 +82,23 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
                     'mappings' => [
                         'properties' => [
                             'name' => ['type' => 'text'],
+                            'description' => ['type' => 'text'],
                             'date' => ['type' => 'date', 'format' => 'yyyy-MM-dd'],
                             'apartment_id' => ['type' => 'integer'],
                             'property_id' => ['type' => 'integer'],
                             'postcode' => ['type' => 'keyword'],
-                            'city' => ['type' => 'keyword'],
-                            'area' => ['type' => 'keyword'],
+                            'city' => [
+                                'type' => 'text',
+                                'fields' => [
+                                    'raw' => ['type' => 'keyword']
+                                ]
+                            ],
+                            'area' => [
+                                'type' => 'text',
+                                'fields' => [
+                                    'raw' => ['type' => 'keyword']
+                                ]
+                            ],
                             'apartment_type' => ['type' => 'keyword'],
                             'rate' => ['type' => 'float'],
                             'available' => ['type' => 'boolean'],

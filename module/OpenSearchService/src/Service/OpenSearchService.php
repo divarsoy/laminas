@@ -138,9 +138,34 @@ class OpenSearchService
     {
         if ($searchText) {
             $this->params->addBaseMust([
-                'multi_match' => [
-                    'query' => $searchText,
-                    'fields' => ['name^2', 'description']
+                'bool' => [
+                    'should' => [
+                        [
+                            'multi_match' => [
+                                'query' => $searchText,
+                                'fields' => ['description','name^2', 'city^3', 'area^4'],
+                                'type' => 'best_fields',
+                                'operator' => 'and'
+                            ]
+                        ],
+                        [
+                            'match_phrase_prefix' => [
+                                'city' => [
+                                    'query' => $searchText,
+                                    'boost' => 3
+                                ]
+                            ]
+                        ],
+                        [
+                            'match_phrase_prefix' => [
+                                'area' => [
+                                    'query' => $searchText,
+                                    'boost' => 2
+                                ]
+                            ]
+                        ]
+                    ],
+                    'minimum_should_match' => 1
                 ]
             ]);
         }
