@@ -3,32 +3,37 @@ namespace OpenSearchService\Service;
 
 use OpenSearch\ClientBuilder;
 use Carbon\Carbon;
+use OpenSearchService\Model\OpenSearchParams;
+use OpenSearch\Client;
 
+/**
+ * Service for searching properties in OpenSearch.
+ */
 class OpenSearchService
 {
-    /** @var \OpenSearch\Client */
-    private $client;
-    private $index = 'properties';
-    private $filter = [];
-    private $must = [];
-    private $ignoreAvailability = false;
-    private ?Carbon $startDate;
-    private ?Carbon $endDate;
+    private Client $client;
+    private OpenSearchParams $params;
     private int $numberOfDays = 1;
+    private ?Carbon $startDate = null;
+    private ?Carbon $endDate = null;
+    private bool $ignoreAvailability = false;
 
-    public function __construct(array $hosts = ['opensearch:9200'])
+    /**
+     * @param OpenSearchParams $params
+     * @param array $hosts
+     */
+    public function __construct(OpenSearchParams $params, array $hosts = ['opensearch:9200'])
     {
-        $this->client = ClientBuilder::create()
-            ->setHosts($hosts)
-            ->build();
+        $this->client = ClientBuilder::create()->setHosts($hosts)->build();
+        $this->params = $params;
     }
 
-    public function getClient(): \OpenSearch\Client
-    {
-        return $this->client;
-    }
-
-    public function search($queryParams)
+    /**
+     * Main search entry point.
+     * @param array $queryParams
+     * @return array
+     */
+    public function search(array $queryParams): array
     {
         $searchText = $queryParams['q'] ?? null;
         $filters = $queryParams['filters'] ?? [];
@@ -36,25 +41,18 @@ class OpenSearchService
         $rateMax = $queryParams['rate_max'] ?? null;
         $startDate = $queryParams['start_date'] ?? null;
         $endDate = $queryParams['end_date'] ?? null;
-
-        $this->reset();
+        $this->initialise();
         $this->parseFacetFilters($filters);
-        $this->parseDateFilter($startDate,$endDate);
+        $this->parseDateFilter($startDate, $endDate);
         $this->parseSearchString($searchText);
         $this->parseRateRange($rateMin, $rateMax);
-        $this->ignoreAvailabilityCheck();
-        $params = $this->buildParams();
 
-        if($this->ignoreAvailability){
-            $results = $this->client->search($params);
-            return [
-                'results' => $results['hits']['hits'] ?? [],
-                'facets' => $results['aggregations'] ?? [],
-                'total' => $results['hits']['total']['value'] ?? 0
-            ];
+        if ($this->ignoreAvailability) {
+            $results = $this->client->search($this->params->buildNoDateParams());
+            return $this->formatResults($results);
         }
-        
-        $availableApartments = $this->findAvailableApartments($params);
+
+        $availableApartments = $this->findAvailableApartments();
         if (empty($availableApartments)) {
             return [
                 'results' => [],
@@ -62,8 +60,25 @@ class OpenSearchService
                 'total' => 0
             ];
         }
-        $results = $this->findApartmentsForDate($params, $availableApartments, $this->startDate);
+        if ($this->startDate === null) {
+            throw new \RuntimeException('Start date must be set before searching for apartments by date.');
+        }
+        $filter = ['terms' => ['apartment_id' => $availableApartments]];
+        $params = $this->params->buildFilteredDateRangeParams($filter);
+        $results = $this->client->search($params);
+        return $this->formatResults($results);
+    }
 
+    private function initialise():void{
+        $this->params->reset();
+        $this->ignoreAvailability = false;
+        $this->numberOfDays = 1;
+        $this->startDate = null;
+        $this->endDate = null;
+    }
+
+    private function formatResults(array $results): array
+    {
         return [
             'results' => $results['hits']['hits'] ?? [],
             'facets' => $results['aggregations'] ?? [],
@@ -71,88 +86,42 @@ class OpenSearchService
         ];
     }
 
-    private function findAvailableApartments($params)
+    private function findAvailableApartments(): array
     {
-        $params['body']['aggs']['available_rooms'] = [
-            'terms' => [
-                'field' => 'apartment_id',
-                'size' => 10000
-            ],
-            'aggs' => [
-                'dates_available' => [
+        $this->params->setDateRangeAggs([
+            'available_rooms' => [
+                'terms' => [
+                    'field' => 'apartment_id',
+                    'size' => 10000
+                ],
+                'aggs' => [
+                    'dates_available' => [
                         'value_count' => [
                             'field' => 'date'
                         ]
                     ],
-                'only_fully_available' => [
-                    'bucket_selector' => [
-                        'buckets_path' => [
-                            'dateCount' => 'dates_available'
-                        ],
-                        'script' => "params.dateCount == $this->numberOfDays"
+                    'only_fully_available' => [
+                        'bucket_selector' => [
+                            'buckets_path' => [
+                                'dateCount' => 'dates_available'
+                            ],
+                            'script' => "params.dateCount == {$this->numberOfDays}"
+                        ]
                     ]
-                ]
-            ],                
-        ];
-
+                ],
+            ]
+        ]);
+        $params = $this->params->buildDateRangeParams();
         $availableApartments = $this->client->search($params);
         $apartments = [];
         if (isset($availableApartments['aggregations']['available_rooms']['buckets'])) {
-            foreach($availableApartments['aggregations']['available_rooms']['buckets'] as $bucket) {
+            foreach ($availableApartments['aggregations']['available_rooms']['buckets'] as $bucket) {
                 $apartments[] = $bucket['key'];
             }
         }
         return $apartments;
     }
-    private function buildParams()
-    {
-        $aggs = [
-            'apartment_type' => ['terms' => ['field' => 'apartment_type']],
-            'cities' => ['terms' => ['field' => 'city']],
-            'building_type' => ['terms' => ['field' => 'building_type']],
-            'apartment_facilities' => ['terms' => ['field' => 'apartment_facilities']],
-            'kitchen_facilities' => ['terms' => ['field' => 'kitchen_facilities']],
-            'building_facilities' => ['terms' => ['field' => 'building_facilities']],
-            'health_and_safety_facilities' => ['terms' => ['field' => 'health_and_safety_facilities']],
-            'sustainability' => ['terms' => ['field' => 'sustainability']],
-
-            'rate_ranges' => [
-                'range' => [
-                    'field' => 'rate',
-                    'ranges' => [
-                        ['to' => 100],
-                        ['from' => 100, 'to' => 200],
-                        ['from' => 200]
-                    ]
-                ]
-            ]
-        ];
-
-        $params = [
-            'index' => $this->index,
-            'body' => [
-                'size' => 20,
-                'query' => [
-                    'bool' => [
-                        'must' => $this->must,
-                        'filter' => $this->filter
-                    ]
-                ],
-                'aggs' => $aggs
-            ]
-        ];
-        return $params;
-    }
-    private function ignoreAvailabilityCheck()
-    {
-        if ($this->ignoreAvailability) {
-            $this->must[] = [
-                'term' => ['date' => $this->startDate->toDateString()]
-            ];  
-        }
-    }
-
-    private function parseRateRange($rateMin, $rateMax)
+    private function parseRateRange($rateMin, $rateMax): void
     {
         if ($rateMin !== null || $rateMax !== null) {
             $range = [];
@@ -162,23 +131,21 @@ class OpenSearchService
             if ($rateMax !== null) {
                 $range['lte'] = (float)$rateMax;
             }
-            $this->filter[] = ['range' => ['rate' => $range]];
+            $this->params->addBaseFilter(['range' => ['rate' => $range]]);
         }
     }
-
-    private function parseSearchString($searchText)
+    private function parseSearchString(?string $searchText): void
     {
         if ($searchText) {
-            $this->must[] = [
+            $this->params->addBaseMust([
                 'multi_match' => [
                     'query' => $searchText,
                     'fields' => ['name^2', 'description']
                 ]
-            ];
+            ]);
         }
     }
-
-    private function parseDateFilter($start, $end)
+    private function parseDateFilter($start, $end): void
     {
         try {
             if ($start === null) {
@@ -190,7 +157,8 @@ class OpenSearchService
                     throw new \InvalidArgumentException('Invalid start date format. Expected format: YYYY-MM-DD');
                 }
             }
-
+            $this->params->setSingleDateMust(['term' => ['date' => $this->startDate->toDateString()]]);
+            
             if ($end === null) {
                 $this->endDate = Carbon::now()->addDay();
             } else {
@@ -198,58 +166,53 @@ class OpenSearchService
                 if (!$this->endDate->isValid()) {
                     throw new \InvalidArgumentException('Invalid end date format. Expected format: YYYY-MM-DD');
                 }
-
                 if ($this->endDate->lt($this->startDate)) {
                     throw new \InvalidArgumentException('End date must be after start date');
                 }
-
                 $this->numberOfDays = $this->startDate->diffInDays($this->endDate);
                 if ($this->numberOfDays < 1) {
                     throw new \InvalidArgumentException('Date range must be at least 1 day');
                 }
-
-                $dateRange = [
-                    'gte' => $this->startDate->toDateString(),
-                    'lt' => $this->endDate->toDateString()
-                ];
-                $this->filter[] = ['range' => ['date' => $dateRange]];
-
                 if (!$this->ignoreAvailability) {
-                    
-                    $this->must[] = [
-                            'term' => ['available' => true]
-                    ];
-                    $this->must[] = [
-                            'range' => [
-                                'date' => [
-                                    'gte' => $this->startDate->toDateString(),
-                                    'lt' => $this->endDate->toDateString()
-                                ]
+                    $this->params->addBaseMust([
+                        'term' => ['available' => true]
+                    ]);
+                    $this->params->addDateRangeMust([
+                        'range' => [
+                            'date' => [
+                                'gte' => $this->startDate->toDateString(),
+                                'lt' => $this->endDate->toDateString()
                             ]
-                    ];
-
+                        ]
+                    ]);
                 }
             }
         } catch (\Exception $e) {
-            // Log the error and rethrow
             error_log("Date validation error: " . $e->getMessage());
             throw $e;
         }
     }
-    private function parseFacetFilters($filters)
+    private function parseFacetFilters(array $filters): void
     {
-        // Facet filters
         foreach ($filters as $field => $value) {
             try {
                 if (is_array($value)) {
-                    $this->filter[] = ['terms' => [$field => $value]];
+                    $this->params->addBaseFilter(['terms' => [$field => $value]]);
                 } else {
-                    // Handle comma-separated values
                     if (strpos($value, ',') !== false) {
                         $values = array_map('trim', explode(',', $value));
-                        $this->filter[] = ['terms' => [$field => $values]];
+                        $this->params->addBaseFilter([
+                            'terms_set' => [
+                                $field => [
+                                    'terms' => $values,
+                                    'minimum_should_match_script' => [
+                                        'source' => 'params.num_terms'
+                                    ]
+                                ]
+                            ]
+                        ]);
                     } else {
-                        $this->filter[] = ['term' => [$field => $value]];
+                        $this->params->addBaseFilter(['term' => [$field => $value]]);
                     }
                 }
             } catch (\Exception $e) {
@@ -257,26 +220,4 @@ class OpenSearchService
             }
         }
     }
-
-    private function reset()
-    {
-        $this->filter = [];
-        $this->must = [];
-        $this->ignoreAvailability = false;
-        $this->startDate = null;
-        $this->endDate = null;
-        $this->numberOfDays = 1;
-    }
-
-    private function findApartmentsForDate(array $params, array $apartments, Carbon $date) {
-        $dateString = $date->toDateString();
-        
-        // Rebuild the parameters to ensure facets are calculated on the properly filtered dataset
-        $finalParams = $this->buildParams();
-        $finalParams['body']['query']['bool']['filter'][] = ["terms" => ["apartment_id" => $apartments]];
-        $finalParams['body']['query']['bool']['filter'][] = ["term" => ["date" => $dateString]];
-
-        return $this->client->search($finalParams);
-    }
-
-} 
+}

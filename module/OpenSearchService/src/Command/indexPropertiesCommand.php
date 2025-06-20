@@ -1,7 +1,6 @@
 <?php
 namespace OpenSearchService\Command;
 
-use OpenSearchService\Service\OpenSearchService;
 use Laminas\Cli\Command\AbstractParamAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -9,6 +8,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use OpenSearchService\Model\Property;
 use Carbon\Carbon;
 use Carbon\CarbonPeriod;
+use OpenSearch\ClientBuilder;
 
 class IndexPropertiesCommand extends AbstractParamAwareCommand
 {
@@ -17,11 +17,10 @@ class IndexPropertiesCommand extends AbstractParamAwareCommand
     protected $openSearchService;
     protected $client;
 
-    public function __construct(OpenSearchService $openSearchService)
+    public function __construct($hosts)
     {
         parent::__construct();
-        $this->openSearchService = $openSearchService;
-        $this->client = $this->openSearchService->getClient();
+        $this->client = ClientBuilder::create()->setHosts($hosts)->build();
     
     }
 

@@ -17,6 +17,7 @@ return [
             'hosts' => [
                 'http://opensearch:9200'
             ],
+            'index' => 'properties',
         ],
     ],
     'laminas-cli' => [
